@@ -1,0 +1,44 @@
+{%extends "base.html"%}
+
+{%block title%}
+HomePage
+{%endblock%}
+
+
+{% block content %}
+
+  <div class="container">
+
+    <div class="row justify-content-md-center">
+      <div class="col-md-8 pt-5">
+    {% for post in posts %}
+      <!--<a href="{{post.get_absolute_url}}">link</a>  it gives us the URL of the individual post-->
+      <div class="col-12"><h1><a class="text-dark" href="{{post.get_absolute_url}}" style="text-decoration: none;"><b>{{post.title}}</b></a></h1></div>
+      <div class="col-12"><p>{{post.excerpt}}</p></div>
+      <br>
+    {% endfor %}
+      </div>
+    </div>
+
+  </div>
+
+{% endblock %}
+
+
+
+
+
+
+
+<!--
+      <h1>Hello, world!</h1>
+      {% for post in posts %}
+        {{post.title}}
+        <br> just for the sake of demonstration we made a break :))
+        {{post.author}}
+        <br><br> so what we should see now is the title and the author of every single post that we have in our database. we can check this through this url address '127.0.0.1:8000/blog/'. just remember that by the address of our admin panel is '127.0.0.1:8000/admin/'
+      {%endfor%}
+    </body>
+  </html>
+  we copy paste that from Bootstrap website
+ -->
