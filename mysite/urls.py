@@ -18,5 +18,5 @@ from django.urls import path, include #we added 'include' because of line 21
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('blog/', include('blog.urls', namespace='blog')), #this line is for connecting up to 'urls.py' file in 'blog' app. It specifies that any URL starting with 'blog/' should be handled according to the rules defined in the included URL configuration. 'namespace='blog'' in your URL configuration helps prevent naming collisions between URL patterns across different apps. 
+    path('', include('blog.urls', namespace='blog')), #this line is for connecting up to 'urls.py' file in 'blog' app. It specifies that any URL starting with 'blog/' should be handled according to the rules defined in the included URL configuration. 'namespace='blog'' in your URL configuration helps prevent naming collisions between URL patterns across different apps. 
 ]

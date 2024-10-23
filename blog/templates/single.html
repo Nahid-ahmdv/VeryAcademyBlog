@@ -17,9 +17,40 @@
 
         <div class="row justify-content-md-center pt-5">
           <div class="col-md-8">
-          <div class="col-12"><h1><b>{{individualpost.title}}</b></h1></div>
-          <div class="col-12"><p>{{individualpost.content|safe}}</p></div>
-          <br>
+            <div class="col-12"><h1><b>{{individualpost.title}}</b></h1></div>
+            <div class="col-12"><p>{{individualpost.content|safe}}</p></div>  <!--we a user made a post and use some p tags, or div tags and etc. to make the display of their post pretty, we use the safe to not display the HTML but to actually render the HTML on the page.-->
+            
+            
+            <!--here we gonna add this comment section underneath the content. Let's go ahead and create a new div-->
+            <div class="col-md-12">{% with previouscomments.count as total_comments %}
+              <h2><b>{{total_comments}} comment{{total_comments|pluralize}}</b></h2>
+              {% endwith %}
+              {% for comment in previouscomments %}
+              Comment {{ forloop.counter }} by {{ comment.name }}   <!--{{ forloop.counter }}: This variable provides the current iteration number (1-based index) of the loop, allowing you to display a sequential number for each comment (e.g., "Comment 1", "Comment 2", etc.).-->
+              on {{ comment.publish }}
+              {{ comment.content | linebreaks }} <!--The 'linebreaks' filter converts line breaks in plain text into HTML '<p>' tags and '<br>' tags. This is useful for preserving formatting when users submit comments with new lines. For example, if a user writes a comment with line breaks, using this filter will ensure that those breaks are reflected in the rendered HTML.-->
+              {% empty %}    <!--اگه کامنتی نبود خط بعدی نمایش داده می‌شه-->    <!--This tag is part of the 'for' loop in Django templates and provides a way to handle cases where the iterable (in this case, 'previouscomments') is empty. If 'previouscomments' contains no items, the code within this block will be executed.-->
+              <p>There is no comments for this post.</p>
+              {% endfor %}
+              <h2><b>Make a new comment</b></h2>
+              <form id="myForm" method="post"> <!--This line begins a form element with an ID of 'myForm'. The 'method="post"' attribute specifies that the form data will be sent to the server using the 'POST' method when submitted. Using 'POST' is common for forms that modify data, such as adding comments, as it keeps the data secure and hidden from the URL.-->
+                <!--In Django, forms can be rendered in different formats using built-in methods. The 'as_p' method is one of these options. When you call '{{ comment_form.as_p }}', Django generates HTML for the form fields and wraps each field in a <p> tag. This makes the form visually structured and easy to read.-->
+                    {% csrf_token %} <!--This is just a template tag which helps protect us from cross-site request forgeries--> <!--This template tag generates a CSRF (Cross-Site Request Forgery) token, which is essential for security in Django forms. It prevents unauthorized submissions by ensuring that the request comes from a legitimate source.-->
+                    <div class="form-group">
+                        <label for="id_name">Name:</label>
+                        {{ comment_form.name }}  <!-- Render the field directly -->
+                    </div>
+                    <div class="form-group">
+                        <label for="id_email">Email:</label>
+                        {{ comment_form.email }}  <!-- Render the field directly -->
+                    </div>
+                    <div class="form-group">
+                        <label for="id_content">Comment:</label>
+                        {{ comment_form.content }}  <!-- Render the field directly -->
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-lg w-100 mt-3 mb-3">Submit</button>
+               </form>
+            </div>
           </div>
         </div>
     </div>

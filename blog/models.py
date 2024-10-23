@@ -80,3 +80,17 @@ First we created a superuser to get to the admin area\Django administration (usi
 #127.0.0.1:8000/blog/ ساختیم که از طریق این یوآرال index.html قبل از عملی کردن خط بالا صرفا برای امتحان یک
 #بهش دسترسی پیدا میکردیم و هلو ورد برامون نمایش میداد. بعدش خط بعدی را آقاهه گفت
 #now let's work out how to get information from our database and put it onto our page. so let's go back to our 'views.py'.(for this purpose, we extend our 'home' view. first of all we're gonna need to collect all the data from the database which in this case means select all the posts from 'Post' table. so first of all l need to make sure that this page (i think he means our HTML template) can access my model so we need to import "from .models import Post" in 'views.py' file, by importing that now we can access 'Post' model and run a simple query, so let's setup a very simple query that is access all the post information in the 'Post' model)
+
+#now we need to store information about comments that users enter. So we need a new database\table\model, and we're gonna need to make a connection from 'Comment' table to the 'Post' table. The reason why that is, because we want to store the comments inside of this table but we need some sort of reference so that we know what comments are associated to what posts. So we're gonna create a foreign key. we're gonna create a new field called 'post' and create a new foreign key, so we're gonna connect this to the 'Post' model.
+class Comment(models.Model):
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="comments")
+    name = models.CharField(max_length=50) #our comment system is gonna need the user to type in a comment, a name of some sort and an email and then they can type in the actual comment (content) so we're gonna store that too inside of a textfield.
+    email = models.EmailField()
+    content = models.TextField()
+    publish = models.DateTimeField(auto_now_add=True) #when we want to order the comments we can order them by published date.
+    status = models.BooleanField(default=True) #you might later on want to be able to disable some of the comments or you might want to filter or administrate some of the comments that are inappropriate so instead of just deleting them we could put them in some sort of status area so we could change the status from True to False. S here if the status is True then the comment is live and if this boolean Field is False then the status iS False and the comment won't be shown to the users
+    class Meta:
+        ordering = ('-publish',)
+
+    def __str__(self):
+        return f"Comment by {self.name}"
