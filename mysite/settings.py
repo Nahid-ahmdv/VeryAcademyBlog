@@ -9,13 +9,14 @@ https://docs.djangoproject.com/en/3.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.0/ref/settings/
 """
-
+# from django.core.files.storage import FileSystemStorage  #this is one way to store files that users upload. the other way is writing a function in 'models.py' called 'user_directory_path'.
+# fs = FileSystemStorage(location='/media/photos')   
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-#BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-from pathlib import Path
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# from pathlib import Path
+# BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
@@ -121,5 +122,8 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'  # Ensure you have this directory created
+# MEDIA_URL = '/media/'
+# MEDIA_ROOT = BASE_DIR / 'media'  # Ensure you have this directory created
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media') #first: we need to define the media root which is going to be the operating system path and then 'BASE_DIR' and then a folder called 'media'.
+MEDIA_URL = '/media/' #second: so this will define the fact that we're gonna be utilizing our domain name slash then a folder called 'media'. so then l will go ahead and create a folder called 'media' for the images that l'm gonna be saving. so to get this all working the next step is that we're going to install 'pillow' (python image library) which is a free and open source additional library for the python programming language that adds support for opening manipulating and saving many different file image formats. after installing 'pillow' now
+#we are ready to head over to the 'blog' app and then open up the 'models.py' and add a specific field to our 'Post' model, after that we go to 'urls.py' file in 'mysite' folder and add this line underneath the 'urlpatterns' "static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)". and we also need to import two things here "from django.conf import settings from django.conf.urls.static import static", then we go to our template 'index.html'

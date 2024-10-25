@@ -21,7 +21,7 @@ from . import models
 
 @admin.register(models.Post) #This decorator registers the 'Post' model with the Django admin site, allowing it to be managed through the admin interface.
 class AuthorAdmin(admin.ModelAdmin): #This defines a custom admin class for the 'Post' model, inheriting from 'admin.ModelAdmin'. This allows for customization of how the model is displayed in the admin.
-    list_display = ('title','category','status', 'slug', 'author', 'image')
+    list_display = ('title','id', 'category','status', 'slug', 'author')
     prepopulated_fields = {"slug":("title",),}#پر می‌شود slug وقتی یک پست بخواهیم درست کنیم، به محض وارد کردن تایتلش خودبه‌خود فیلد مربوط به #This attribute allows automatic generation of certain fields based on other fields. Here, it automatically populates the 'slug' field based on the value entered in the 'title' field.
 
 @admin.register(models.Comment) #This decorator registers the 'Comment' model with the Django admin site.

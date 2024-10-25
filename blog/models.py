@@ -6,6 +6,14 @@ from django.urls import reverse #وصل کنیم، از این تابع کمک �
 
 
 # Create your models here.
+def user_directory_path(instance, filename):
+    return 'post_images/{0}/{1}'.format(instance.id, filename)  #so when we make a new post, the post is given an id, so that is something that happens behind the scenes because as you notice we haven't actually set an id field in our 'Post' model. 
+# so there's an id primary key that's utilized on this table (Post) that we're not seeing in 'Post' table, but l make that visible surely. 
+# So l'm gonna use that id (that unique id to every single post) and that's going to build a folder with that id({0}) and then also after that it's gonna be the file name ({1}) and that will place nicely inside of that folder. 
+# and now l just need to reference this function inside of 'cardimage' field of our model 'Post'.
+
+
+
 class Category(models.Model):
     name = models.CharField(max_length=100)
     def __str__(self):
@@ -23,7 +31,8 @@ class Post(models.Model):  #this is a new table (in the database) called Post. T
     title = models.CharField(max_length=250) #Title Field. Type: 'CharField'. Purpose: Stores the title of the post.
     category = models.ForeignKey(Category, on_delete=models.PROTECT, default=3, related_name="posts")#ساختیم،هم جزو همین کتگوری قرار خواهند گرفت Category است. از طرفی تمام پست‌هایی هم که تا الان، قبل از ایجاد مدلdefault آیدی کتگوری دیفالت که 3 هست را بهش دادیم پس هر وقت پست جدیدی درست کنیم کتگوری دیفالتش #"PROTECT":Forbid the deletion of the referenced object. In this case, it means this is gonna forbid the deletion of our categories. This is gonna avoid people being able to delete any of our categories.    # we can't make a new post unless we give it a category.
     excerpt = models.TextField(null=True)
-    image = models.ImageField(upload_to='post_images/', blank=True, null=True)
+    # cardimage = models.ImageField(upload_to='post_images/', blank=True, null=True)
+    cardimage = models.ImageField(upload_to=user_directory_path, blank=True, null=True)  #so now when l add a new image it should be uploaded to a directory that matches the id of that particular post and the name of the image.
     slug = models.SlugField(max_length=250, unique_for_date='publish_date') #Slug Field. Type: 'SlugField'. Purpose: Stores a URL-friendly version of the title, often used in URLs. #For example, if you have a blog post titled "Understanding Django Models," the slug might be 'understanding-django-models'. This makes the URL more user-friendly and easier to remember, such as:'example.com/posts/understanding-django-models #The 'unique_for_date='publish'' argument adds a significant constraint: This constraint guarantees that no two posts can have the same slug on the same publish date. For instance, if you publish two articles on the same day with similar titles, this prevents both from having the same slug. Benefits of Using Slugs: Readability: Slugs make URLs easier to read and understand for users. SEO(search engine optimization) Friendly: Search engines often favor URLs that include keywords relevant to the content. Avoiding IDs: Instead of using numeric IDs in URLs (which are not meaningful to users), slugs provide context about the content.
     publish_date = models.DateTimeField(default=timezone.now) #Publish Date Field. Type: 'DateTimeField'. Purpose: Stores the date and time when the post is published.
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='blog_posts')#we created a foreignkey to the table 'User' #we're gonna store the username of that user who built the post into this field using foreignkey. #Author Field. Type: 'ForeignKey'. Purpose: Creates a relationship with the 'User' model, indicating who authored the post. On Delete Behavior: If the user is deleted, all their related posts will also be deleted (CASCADE). Related Name: Allows access to all posts by a user through 'user_instance.blog_posts'. The term 'related name' in Django refers to a convenient way to access related objects from the reverse side of a foreign key relationship. In your 'Post' model, this line indicates that each 'Post' is linked to a 'User' (the author). The 'related_name='blog_posts'' allows you to access all posts written by a specific user in a more intuitive manner.

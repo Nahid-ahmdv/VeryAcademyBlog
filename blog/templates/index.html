@@ -17,11 +17,11 @@ HomePage
       </div>
       <div class="row">
           {% for post in posts %}
-              <div class="col-md-4">
+              <div class="col-md-4 mb-4">
                   <a class="text-dark text-decoration-none" href="{{ post.get_absolute_url }}">
                       <div class="card md-4 box-shadow">
-                          {% if post.image %}
-                              <img class="card-img-top" src="{{ post.image.url }}" alt="{{ post.title }}">
+                          {% if post.cardimage %}
+                              <img class="card-img-top" src="{{ post.cardimage.url }}" alt="{{ post.title}}">
                           {% else %}
                               <img class="card-img-top" src="https://hips.hearstapps.com/hmg-prod/images/lewis-hamilton-of-great-britain-and-mercedes-walks-in-the-news-photo-1722974620.jpg?crop=1.00xw:1.00xh;0,0&resize=1200:*" alt="Default Image">
                           {% endif %}
@@ -40,23 +40,7 @@ HomePage
   </div>
 </div>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+{% endblock %}
 
 
 
@@ -79,7 +63,7 @@ HomePage
 
   </div>
 -->
-{% endblock %}
+
 
 
 

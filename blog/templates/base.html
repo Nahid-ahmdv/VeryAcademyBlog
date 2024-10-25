@@ -35,6 +35,38 @@
         </div>
       </div>
     </nav>
+  <style>
+    .card {
+      transition: box-shadow 0.3s; /* Optional: smooth shadow transition */
+  }
+  
+  .card:hover {
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Optional: add shadow on hover */
+  }
+  
+  .post-title {
+      display: inline-block; /* Allows the underline to be applied only to the text */
+      position: relative; /* Needed for positioning the pseudo-element */
+      color: #333; /* Text color */
+      text-decoration: none; /* Remove default underline */
+  }
+  
+  .post-title::after {
+      content: ''; /* Create an empty pseudo-element */
+      position: absolute; /* Position it relative to the title */
+      width: 100%; /* Full width of the text */
+      height: 2px; /* Height of the underline */
+      background-color: #0087ca; /* Color of the underline */
+      bottom: 0; /* Position it at the bottom of the text */
+      left: 0; /* Align it to the left */
+      transform: scaleX(0); /* Start hidden */
+      transition: transform 0.3s ease; /* Smooth transition for the effect */
+  }
+  
+  .card:hover .post-title::after {
+      transform: scaleX(1); /* Show underline on hover over the card */
+  }
+</style>
 </head>
 <body>
     {% block content %}
