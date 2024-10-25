@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}
+CatList
+{% endblock %}
+
+{% block content %}
+
+
+
+<div class="album py-5 bg-light">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 pb-5">
+                <h1>List of {{ catlist.cat }} posts:</h1> <!-- this 'catlist' is what we wrote in 'CatListView' view in 'views.py' -->
+            </div>
+        </div>
+        <div class="row">
+            {% for post in catlist.postsofacat %}
+                <div class="col-md-4">
+                    <a class="text-dark text-decoration-none" href="{{ post.get_absolute_url }}">
+                        <div class="card md-4 box-shadow">
+                            {% if post.image %}
+                                <img class="card-img-top" src="{{ post.image.url }}" alt="{{ post.title }}">
+                            {% else %}
+                                <img class="card-img-top" src="https://hips.hearstapps.com/hmg-prod/images/lewis-hamilton-of-great-britain-and-mercedes-walks-in-the-news-photo-1722974620.jpg?crop=1.00xw:1.00xh;0,0&resize=1200:*" alt="Default Image">
+                            {% endif %}
+                            <div class="card-body">
+                                <h2 style="font-size:18px; font-weight:bold;">{{ post.title|truncatechars:50 }}</h2>
+                                <p class="card-text">{{ post.excerpt|truncatechars:50 }}</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-muted">9 mins</small>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -7,12 +7,69 @@ HomePage
 
 {% block content %}
 
+
+<div class="album py-5 bg-light">
+  <div class="container">
+      <div class="row">
+          <div class="col-12 pb-5">
+              <!--<h1>List of {{ catlist.cat }} posts:</h1>  this 'catlist' is what we wrote in 'CatListView' view in 'views.py' -->
+          </div>
+      </div>
+      <div class="row">
+          {% for post in posts %}
+              <div class="col-md-4">
+                  <a class="text-dark text-decoration-none" href="{{ post.get_absolute_url }}">
+                      <div class="card md-4 box-shadow">
+                          {% if post.image %}
+                              <img class="card-img-top" src="{{ post.image.url }}" alt="{{ post.title }}">
+                          {% else %}
+                              <img class="card-img-top" src="https://hips.hearstapps.com/hmg-prod/images/lewis-hamilton-of-great-britain-and-mercedes-walks-in-the-news-photo-1722974620.jpg?crop=1.00xw:1.00xh;0,0&resize=1200:*" alt="Default Image">
+                          {% endif %}
+                          <div class="card-body">
+                              <h2 style="font-size:18px; font-weight:bold;">{{ post.title|truncatechars:50 }}</h2>
+                              <p class="card-text">{{ post.excerpt|truncatechars:50 }}</p>
+                              <div class="d-flex justify-content-between align-items-center">
+                                  <small class="text-muted">9 mins</small>
+                              </div>
+                          </div>
+                      </div>
+                  </a>
+              </div>
+          {% endfor %}
+      </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--
+
   <div class="container">
 
     <div class="row justify-content-md-center">
       <div class="col-md-8 pt-5">
     {% for post in posts %}
-      <!--<a href="{{post.get_absolute_url}}">link</a>  it gives us the URL of the individual post-->
+      ##<a href="{{post.get_absolute_url}}">link</a>  it gives us the URL of the individual post##
       <div class="col-12"><h1><a class="text-dark" href="{{post.get_absolute_url}}" style="text-decoration: none;"><b>{{post.title}}</b></a></h1></div>
       <div class="col-12"><p>{{post.excerpt}}</p></div>
       <br>
@@ -21,7 +78,7 @@ HomePage
     </div>
 
   </div>
-
+-->
 {% endblock %}
 
 

@@ -20,8 +20,8 @@ from django.contrib import admin  #This imports the Django admin module, which a
 from . import models 
 
 @admin.register(models.Post) #This decorator registers the 'Post' model with the Django admin site, allowing it to be managed through the admin interface.
-class Authoradmin(admin.ModelAdmin): #This defines a custom admin class for the 'Post' model, inheriting from 'admin.ModelAdmin'. This allows for customization of how the model is displayed in the admin.
-    list_display = ('title','status', 'slug', 'author')
+class AuthorAdmin(admin.ModelAdmin): #This defines a custom admin class for the 'Post' model, inheriting from 'admin.ModelAdmin'. This allows for customization of how the model is displayed in the admin.
+    list_display = ('title','category','status', 'slug', 'author', 'image')
     prepopulated_fields = {"slug":("title",),}#پر می‌شود slug وقتی یک پست بخواهیم درست کنیم، به محض وارد کردن تایتلش خودبه‌خود فیلد مربوط به #This attribute allows automatic generation of certain fields based on other fields. Here, it automatically populates the 'slug' field based on the value entered in the 'title' field.
 
 @admin.register(models.Comment) #This decorator registers the 'Comment' model with the Django admin site.
@@ -31,3 +31,25 @@ class CommentAdmin(admin.ModelAdmin):  #This defines a custom admin class for ma
     search_fields = ("name", "email", "content") #This allows you to search for comments based on specific fields. Here, you can search by name, email, or content of the comment.
 #مدل‌هامون رو نوشتیم و بعد اومدیم اینجا در ادمین پنل‌مون رجیسترشون کردیم و سر و شکل دادیم بهشون و بعد حالا باید بریم توی ویوهامون models.py ما اول رفتیم در فایل 
 #we now need to head over to the view and start thinking about how we're gonna integrate this within our system so that the user of our website can actually make comments.but before that let's create a new file called 'forms.py' and develop a simple form in that file.
+
+
+# admin.site.register(models.Category)  
+# یا
+@admin.register(models.Category)
+class CategoryAdmin(admin.ModelAdmin):  # Fixed the class name
+    list_display = ("name", "get_posts")  # Use a method to get posts
+
+    def get_posts(self, obj):
+        return obj.posts.count()  # Count of related posts  #مون استPost تعریف شده در مدل related_name همون posts این
+    get_posts.short_description = 'Number of Posts'  #اسم ستون مربوطه در ادمین پنل را مشخص می‌کند# Optional: Set a short description for the column
+# یا
+# @admin.register(models.Category)
+# class CategoryAdmin(admin.ModelAdmin):
+#     list_display = ("name", "get_posts")  # Use a method to get posts
+
+#     def get_posts(self, obj):
+#         # Get all related posts
+#         posts = obj.posts.all()
+#         return ", ".join([post.title for post in posts])  # Join titles into a single string
+
+#     get_posts.short_description = 'Related Posts'  # Optional: Set a short description for the column

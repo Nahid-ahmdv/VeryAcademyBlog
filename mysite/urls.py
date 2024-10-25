@@ -15,8 +15,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include #we added 'include' because of line 21
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('blog.urls', namespace='blog')), #this line is for connecting up to 'urls.py' file in 'blog' app. It specifies that any URL starting with 'blog/' should be handled according to the rules defined in the included URL configuration. 'namespace='blog'' in your URL configuration helps prevent naming collisions between URL patterns across different apps. 
-]
+]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
