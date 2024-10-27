@@ -3,6 +3,12 @@ from django.utils import timezone
 from django.contrib.auth.models import User #when we made a new Django project it has a default database for users (a table or model called User) which we see once we start building a superuser and log in to the admin area.
 from django.urls import reverse #وصل کنیم، از این تابع کمک می‌گیریم http://127.0.0.1:8000/blog/ به تایتل آن پست در صفحه ('single.html') پست‌ها را میبینیم، با کلیک روی تایتل هر پست وارد صفحه‌ای منحصر به همان پست شویم. برای این منظور به جای اینکه تک تک و به صورت دستی بیاییم لینک مربوط به صفحه محصربه‌فرد هر پست را http://127.0.0.1:8000/blog/ دلیل ایمپورت کردن این تابع این بود که ما می‌خواستیم وقتی از طریق این صفحه
 #The top line imports the 'reverse()' function from Django’s 'urls' module. The 'reverse()' function is used to generate URLs based on the name of the view rather than hardcoding the URL paths.
+from mptt.models import MPTTModel, TreeForeignKey
+#MPTT (Modified Preorder Tree Traversal): This is an algorithm used to efficiently manage and query tree structures in databases. It allows for fast retrieval of hierarchical data such as categories, comments, or any other nested structures.
+#The MPTT model maintains additional fields ('lft', 'rght', 'tree_id', and 'level') that help represent the tree structure in a flat database table.
+
+
+
 
 
 # Create your models here.
@@ -99,20 +105,49 @@ First we created a superuser to get to the admin area\Django administration (usi
 #now let's work out how to get information from our database and put it onto our page. so let's go back to our 'views.py'.(for this purpose, we extend our 'home' view. first of all we're gonna need to collect all the data from the database which in this case means select all the posts from 'Post' table. so first of all l need to make sure that this page (i think he means our HTML template) can access my model so we need to import "from .models import Post" in 'views.py' file, by importing that now we can access 'Post' model and run a simple query, so let's setup a very simple query that is access all the post information in the 'Post' model)
 
 #now we need to store information about comments that users enter. So we need a new database\table\model, and we're gonna need to make a connection from 'Comment' table to the 'Post' table. The reason why that is, because we want to store the comments inside of this table but we need some sort of reference so that we know what comments are associated to what posts. So we're gonna create a foreign key. we're gonna create a new field called 'post' and create a new foreign key, so we're gonna connect this to the 'Post' model.
-class Comment(models.Model):
-    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="comments")
-    name = models.CharField(max_length=50) #our comment system is gonna need the user to type in a comment, a name of some sort and an email and then they can type in the actual comment (content) so we're gonna store that too inside of a textfield.
+# class Comment(models.Model):
+#     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="comments")
+#     name = models.CharField(max_length=50) #our comment system is gonna need the user to type in a comment, a name of some sort and an email and then they can type in the actual comment (content) so we're gonna store that too inside of a textfield.
+#     email = models.EmailField()
+#     content = models.TextField()
+#     publish = models.DateTimeField(auto_now_add=True) #when we want to order the comments we can order them by published date.
+#     status = models.BooleanField(default=True) #you might later on want to be able to disable some of the comments or you might want to filter or administrate some of the comments that are inappropriate so instead of just deleting them we could put them in some sort of status area so we could change the status from True to False. S here if the status is True then the comment is live and if this boolean Field is False then the status iS False and the comment won't be shown to the users
+#     class Meta:
+#         ordering = ('-publish',)
+
+#     def __str__(self):
+#         return f"Comment by {self.name}"
+# مان اضافه کنیم، این مدل را تغییر دادیم ولی من بهش دست نزدم و کامنتش کردم و این زیر دوباره نوشتمشComment را می‌خواستیم به مدل MPTT در جلسه پنجم که سیستم
+#converting 'Comment' model to MPTT:
+class Comment(MPTTModel): #first: we need to tell it that we're gonna be utilizing or extending from MPTT model. second: we must define a parent field which is a tree foreing key to self. so the tree foreign key that we're gonna define is a regular foreign key that renders form fields differently in admin and a few other places.
+    # By inheriting from 'MPTTModel', the 'Comment' class gains additional functionality to handle tree-like structures efficiently.
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="comments") #This field establishes a many-to-one relationship between the 'Comment' model and another model called 'Post'. 'related_name="comments"': This allows you to access all comments related to a post using 'post.comments.all()'.
+    parent = TreeForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name="children")
+    '''
+    parent: This field allows for nesting comments, enabling a comment to have a parent comment (i.e., a reply).
+    TreeForeignKey('self'): Refers to the same model (Comment). It establishes a self-referential relationship, allowing comments to be linked to other comments.
+    on_delete=models.CASCADE: Similar to the 'post' field, if a parent comment is deleted, all its child comments will also be deleted.
+    null=True, blank=True: These options allow the 'parent' field to be optional. A comment can exist without being a reply to another comment.
+    related_name="children": This allows you to access all child comments of a parent comment using 'parent_comment.children.all()'.
+    Summary
+    In summary, this code defines a hierarchical structure for comments associated with posts in a Django application. 
+    Each comment can either be a top-level comment or a reply to another comment. The use of MPTT enables efficient querying and management of this nested structure.
+    '''
+    name = models.CharField(max_length=50)
     email = models.EmailField()
     content = models.TextField()
-    publish = models.DateTimeField(auto_now_add=True) #when we want to order the comments we can order them by published date.
-    status = models.BooleanField(default=True) #you might later on want to be able to disable some of the comments or you might want to filter or administrate some of the comments that are inappropriate so instead of just deleting them we could put them in some sort of status area so we could change the status from True to False. S here if the status is True then the comment is live and if this boolean Field is False then the status iS False and the comment won't be shown to the users
-    class Meta:
-        ordering = ('-publish',)
+    publish = models.DateTimeField(auto_now_add=True)
+    status = models.BooleanField(default=True)
+    class MPTTMeta:
+        order_insertion_by = ['publish']
 
     def __str__(self):
         return f"Comment by {self.name}"
-    
+#before we migrate our new model and commit to our database let's just go ahead and access the 'admin.py' file and just delete the registration for the existing 'Comment' model.
 
+
+
+#Category توضیحات درباره مدل
 #we need to create a ForeignKey between the 'Post' table and the 'Category' table. But the problem we got here is that we've already got data within our 'Post' table so if l now were to create a ForeignKey between the 'Post' and the 'Category' then that could cause potential problems.
 #It just makes it more difficult to make this model because there has to be something inside of the 'Post'and there has to be something inside the category and at the moment there are no categories so we can't really make that link between the 'Post' table and the 'Category' table. so because we're working on a live database
 #in this case it's probably best for us to just migrate and set the 'Category' table first, then build some categories and then go ahead and create our ForeignKey between the 'Post' table and the 'Category' table. so let's go ahead and go to the admin.py and make our new model available in the admin area\admin panel(127.0.0.1:8000/admin/) so that we can add some categories.

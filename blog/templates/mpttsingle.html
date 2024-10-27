@@ -1,0 +1,159 @@
+{%extends "base.html"%}
+
+{%block title%}
+{{individualpost.title}}
+{%endblock%}
+
+
+{% block content %}
+    <style>
+        @media screen and (min-width: 600px) {
+            .children form {
+                margin-left: 0px;
+            }
+        }
+        .children form {
+            margin-left: -48px;
+        }
+
+        .children .children form {
+            margin-left: -96px;
+        }
+        /* CSS to justify text */
+        p {
+            text-align: justify; /* Justifies the text */
+            margin: 0 0 1em;    /* Adds space between paragraphs */
+        }
+    /* .chldren form{
+        margin-left :-48px;
+    }
+    .chldren.chldren form{
+        margin-left :-96px;
+    }    */
+        
+    </style>
+    <div class="container">
+
+        <div class="row justify-content-md-center pt-5">
+          <div class="col-md-8">
+            <div class="col-12"><h1><b>{{individualpost.title}}</b></h1></div>
+            <div class="col-12"><p>{{individualpost.content|safe}}</p></div>  <!--when a user made a post and use some p tags, or div tags and etc. to make the display of their post pretty, we use the safe to not display the HTML but to actually render the HTML on the page.-->
+            
+            
+            <!--here we gonna add this comment section underneath the content. Let's go ahead and create a new div-->
+            <hr>
+            <div class="col-md-12">{% with previouscomments.count as total_comments %}
+              <h2><b>{{total_comments}} comment{{total_comments|pluralize}}</b></h2>
+              {% endwith %}
+
+              <!--MPTT comes with a range of different tags that we can utilize within our template and to access them fist of all we need to load mptt tags, after that we don't need to use a for loop anymore, l can utilize an MPTT tag to do that automatically for me so l use recurse tree and then pass in the comments -->
+              {% load mptt_tags %}
+              <div>
+              {% recursetree comments %} <!--we're setting up a loop here to loop through all the comments and output the comments utilizing MPTT tags-->
+              <div id="{{ node.id }}" class="my-1 p-1" style="border: 1px solid grey">  <!--به هر کامنت یه ند می‌گیم-->       <!--The data goes into this loop as 'previouscomments' but we refer to it as 'node'. In the context of django-mptt (Modified Preorder Tree Traversal), a node refers to an instance of a model that represents a single point in a hierarchical tree structure. -->
+              <div class="d-flex justify-content-between">By {{ node.name }}<div>{{ node.publish }}</div></div>
+                <div>{{ node.content }}</div>
+                <div>{{ node.level }}</div>
+                <div>{{ node.id }}</div>
+
+                {% if node.level < 3 %}
+                <button class="button" onclick="myFunction('{{ node.id }}')">Reply</button> <!--when we click a button it's going to open a function called 'myFunction' and it is going to pass in to that function the node id, so that when it makes the comment it's gonna connect it to that particular comment that l want to make a reply to-->
+                {% endif %}
+              </div>
+              <hr>
+              {% if not node.is_leaf_node %} <!--A leaf node is a node that does not have any children. --> <!--we're basically gonna check to see if the node is a root node or not, if it's not a root node therefore it is a child node so it's going to output the child. Top-Level Comment: The root node is the initial or primary comment that does not have any parent. It serves as the starting point for any discussion thread.
+              Hierarchy: In a comment system, root nodes can have child nodes (replies) that are linked to them. These child nodes can themselves have further replies, creating a nested structure.-->
+              <div class="children" style="margin-left: 48px">
+                 {{ children }} <!--so here 'children' is just referring to any comments that are related to the main node here. so as this loops through it's gonna loop out the main comment and then it's gonna check to see if it has any child (any connected) comments. if it does, it's gonna output the child -->
+              </div>
+              {% endif %}
+              {% endrecursetree %}
+              </div>
+              <!--
+              {% for comment in previouscomments %}
+              Comment {{ forloop.counter }} by {{ comment.name }}   {{ forloop.counter }}: This variable provides the current iteration number (1-based index) of the loop, allowing you to display a sequential number for each comment (e.g., "Comment 1", "Comment 2", etc.).
+              on {{ comment.publish }}
+              {{ comment.content | linebreaks }} The 'linebreaks' filter converts line breaks in plain text into HTML '<p>' tags and '<br>' tags. This is useful for preserving formatting when users submit comments with new lines. For example, if a user writes a comment with line breaks, using this filter will ensure that those breaks are reflected in the rendered HTML.
+              {% empty %}    اگه کامنتی نبود خط بعدی نمایش داده می‌شه    This tag is part of the 'for' loop in Django templates and provides a way to handle cases where the iterable (in this case, 'previouscomments') is empty. If 'previouscomments' contains no items, the code within this block will be executed.
+              <p>There are no comments for this post.</p>
+              {% endfor %}
+               -->
+
+
+
+              
+              <form id="myForm" method="post"> <!--This line begins a form element with an ID of 'myForm'. The 'method="post"' attribute specifies that the form data will be sent to the server using the 'POST' method when submitted. Using 'POST' is common for forms that modify data, such as adding comments, as it keeps the data secure and hidden from the URL.-->
+                <!--In Django, forms can be rendered in different formats using built-in methods. The 'as_p' method is one of these options. When you call '{{ comment_form.as_p }}', Django generates HTML for the form fields and wraps each field in a <p> tag. This makes the form visually structured and easy to read.-->
+                    <h2><b>Make a new comment</b></h2>
+                    {% csrf_token %} <!--This is just a template tag which helps protect us from cross-site request forgeries--> <!--This template tag generates a CSRF (Cross-Site Request Forgery) token, which is essential for security in Django forms. It prevents unauthorized submissions by ensuring that the request comes from a legitimate source.-->
+                    <div class="form-group">
+                        <label for="id_name">Name:</label>
+                        {{ comment_form.name }}  <!-- Render the field directly -->
+                    </div>
+                    <br><!--
+                    <div class="form-group">
+                        <label for="id_parent">Parent:</label>
+                        {{ comment_form.parent }}  
+                    </div>
+                    <br>-->
+                    <div class="form-group">
+                        <label for="id_email">Email:</label>
+                        {{ comment_form.email }}  <!-- Render the field directly -->
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label for="id_content">Comment:</label>
+                        {{ comment_form.content }}  <!-- Render the field directly -->
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-lg w-100 mt-3 mb-3">Submit</button>
+               </form>
+            </div>
+          </div>
+        </div>
+    </div>
+
+
+
+<script>
+    function formExit() {   //This function removes the form with the ID n'ewForm' from the DOM when called. It is typically used to close or dismiss the reply form without submitting it.
+        document.getElementById('newForm').remove();
+    }
+    function myFunction(id) { //This function is designed to create and display a reply form when a user wants to reply to a specific comment identified by id.
+        if (document.contains(document.getElementById("newForm"))){
+            document.getElementById("newForm").remove();
+        }//The first line checks if a form with the ID 'newForm' already exists in the DOM. If it does, it removes that existing form to ensure that only one reply form is displayed at a time.
+
+        var a = document.getElementById(id); // first of all we're gonna collect the element by id. so we're gonna take in the id of the comment that we want to reply to and we're gonna utilize that to get the element by id.
+        a.insertAdjacentHTML('afterend', 
+        '<form id="newForm" class="form-insert py-2" method="post"> \
+            <div class="d-flex justify-content-between align-items-center"><h2>Reply:</h2><div><button type="button" class="btn btn-outline-warning" onclick="formExit()">Close</button></div></div>\
+            <div class="mb-3">\
+                <label for="id_name" class="form-label">Name:</label> \
+                <input type="text" name="name" class="form-control" maxlength="50" required id="id_name"> \
+            </div> \
+            <select name="parent" class="d-none" id="id_parent"> \
+                <option value="' + id + '" selected></option> \
+            </select> \
+            <div class="mb-3">\
+                <label for="id_email" class="form-label">Email:</label> \
+                <input type="email" name="email" class="form-control" maxlength="254" required id="id_email"> \
+            </div>\
+            <div class="mb-3">\
+                <label for="id_content" class="form-label">Content:</label> \
+                <textarea name="content" rows="4" class="form-control" required id="id_content"></textarea> \
+            </div>\
+            {% csrf_token %}\
+            <button type="submit" class="btn btn-primary btn-lg w-100 mt-3 mb-3">Submit</button>\
+        </form>');
+    }
+
+    // Reset the form with ID 'myForm' if needed
+    $('#myForm').trigger("reset");
+</script>
+
+{% endblock %}
+<!-- The document object is part of the DOM (Document Object Model) and represents the entire HTML document. It allows you to access and manipulate all elements within that document.
+You can use methods on the 'document' object to interact with these parent comments. For example:
+If you want to insert a reply form after a parent comment when a user clicks a "Reply" button, you would use 'document.getElementById()' to select the parent comment element and then use methods like 'insertAdjacentHTML()' to add new content (like a reply form) immediately after it. -->
+
+<!--'document.getElementById(id)': Retrieves an element by its ID.-->

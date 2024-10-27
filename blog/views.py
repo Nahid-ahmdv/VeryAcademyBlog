@@ -4,7 +4,8 @@ from django.shortcuts import render, get_object_or_404, HttpResponseRedirect
 from .models import Post, Category
 from .forms import NewCommentForm
 from django.views.generic import ListView #'ListView' is a built-in generic class-based view provided by Django. It is designed to simplify the process of displaying a list of objects from a database model. By using 'ListView', you can quickly create views that handle common tasks such as retrieving records, paginating results, and rendering them in a template without writing repetitive code.
-# Create your views here.
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger #we add all the scaffolding to easily create a pagination system #اینا رو برای اعمال پجینیشن ایمپورت کردیم
+# Create your views here.  
 def home(request):
     # return render(request, 'index.html')#this line is just returning 'index' page. #this is a simple view and just gonna return a template 'index.html'. and this 'request' object (The 'request' object is an instance of the 'HttpRequest' class) is used to generate the respose back to the user. so now we need to build this 'idex.html' template so it can return this page called 'index.html'. so first we need to create a 'templates' folder and then we need to tell Django where that 'templates' folder is. Django by default is looking for a folder called 'templates' that er built and inside of it we gonna have a file called 'index.html'.
     #all_posts = Post.objects.all() #This is basically doing an SQL statement that select all from the post table #by importing line 2 now we can access 'Post' model and run a simple query, so let's setup a very simple query that is gonna access all the post information in the 'Post' model. now we should pass this information to the template to output them on the page ('index.html' page).
@@ -18,8 +19,18 @@ def post_single(request, post): #this value here 'post' represents that value on
     #mypost = get_object_or_404(Post, slug=post, status='published') #this query stores that individual post into variable 'mypost' and then by next line we pass it over to our template 'single.html' #select from the database 'Post', where post equals slug
     #return render(request, 'single.html', {'individualpost': mypost})  #so now we should build this 'single.html' page.
     #حالا که میخواهیم کامنت‌ها را نیز به صفحه سینگل پست‌مان اضافه کنیم و در واقع این ویو را اکستند کنیم دوباره از اول این ویو را می‌نویسیم
-    mypost = get_object_or_404(Post, slug=post, status='published')
-    previouscomments = mypost.comments.filter(status=True) #است Comment تعریف شده در مدل related_name همون comments این 
+    mypost = get_object_or_404(Post, slug=post, status='published') #می‌ریزیم mypost ورودی تابع‌مان هست را جمع‌آوری کرده و در متغیری به نام post اطلاعات اون پستی را که اسلاگش برابر یا اسلاگ ذخیره شده در پارامتر
+    previouscomments = mypost.comments.filter(status=True) #previouscomments است. تمام کامنت‌های مربوط به آن پست را جمع‌آوری و ذخیره می‌کنیم در متغییری به نام Comment تعریف شده در مدل related_name همون comments این 
+    page = request.GET.get('page', 1)
+    paginator = Paginator(previouscomments, 6)  #this is defining how many items (comments) you what to show on each page. so we want to divide the all comments by 3. so we're gonna show 3 items per page
+    
+    try:  #we're gonna try and get the comments and create the pagination
+        comments = paginator.page(page)
+    except PageNotAnInteger: #raised when page() is given a value that isn't an integer.
+        comments = paginator.page(1)
+    except EmptyPage: #raised when page() is given a valid value but no objects exist on that page.
+        comments = paginator.page(paginator.num_pages)   #جایگزین کردیم و تمام comments را با previouscomments هر کدام در دو جا، عبارت beautifulmpttsingle.html و mpttsingle.html را جایگذاری کردیم و همینطور در دو تمپلیت 'comments': comments در تابع رندر مربوط به همین ویو،عبارت 'previouscomments':previouscomments برای اعمال این پجینیشن در کامنت‌های مربوط به هر صفحه از بلاگ‌مان، به جای 
+    
     user_comment = None
     #so now someone types into the form(which we made for the purpose that our users could make comments on posts of our blog), their name, their email, and the content of their comment. 
     # so that's going to be sent to this function ('post_single') so what we need to do now is capture whether someone has actually made a comment. So we do that by creating an 'if' statement:
@@ -42,7 +53,7 @@ def post_single(request, post): #this value here 'post' represents that value on
         comment_form = NewCommentForm()
         #so what's gonna happen when the user enters the page is that we're gonna run the form and make that form available to the page. so once we've done that we need to just return all this data back to the page so that we can display it on the page. so 
         # what we return is (we send all the following information back to the front-end so that we can display it on the screen):
-    return render(request, 'single.html', {'individualpost': mypost, 'user_comment': user_comment, 'previouscomments': previouscomments, 'comment_form': comment_form}) #ازشان استفاده شده single.html کلیدهای این دیکشنری همون اسم‌هایی هستند که در تمپلیت مربوطه یعنی
+    return render(request, 'beautifulmpttsingle.html', {'individualpost': mypost, 'user_comment': user_comment, 'previouscomments': previouscomments,'comments': comments, 'comment_form': comment_form}) #ازشان استفاده شده single.html کلیدهای این دیکشنری همون اسم‌هایی هستند که در تمپلیت مربوطه یعنی
 
 #we want to build a category page whereby we go to that category page and it shows us all the posts of a specific category. First of all for this purpose we need to import 'ListView' class(a class-based view) from 'django.views.generic' so that we can use class-based views. now we're gonna generate a new class-based view to extract the information from the database that's relevant to the URL. so what
 #does that mean? what we want to do is when someone types in for example 'category/F1/' it's gonna show all the F1 posts. so we're gonna be able to in our view extract the word 'F1' essentially and we're gonna use that to query the database. so let's go ahead and create a new class-based view 
