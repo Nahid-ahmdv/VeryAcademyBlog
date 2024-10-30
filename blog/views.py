@@ -2,9 +2,10 @@ from typing import Any
 from django.db.models.query import QuerySet
 from django.shortcuts import render, get_object_or_404, HttpResponseRedirect
 from .models import Post, Category
-from .forms import NewCommentForm
+from .forms import NewCommentForm, PostSearchForm
 from django.views.generic import ListView #'ListView' is a built-in generic class-based view provided by Django. It is designed to simplify the process of displaying a list of objects from a database model. By using 'ListView', you can quickly create views that handle common tasks such as retrieving records, paginating results, and rendering them in a template without writing repetitive code.
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger #we add all the scaffolding to easily create a pagination system #اینا رو برای اعمال پجینیشن ایمپورت کردیم
+from django.db.models import Q
 # Create your views here.  
 def home(request):
     # return render(request, 'index.html')#this line is just returning 'index' page. #this is a simple view and just gonna return a template 'index.html'. and this 'request' object (The 'request' object is an instance of the 'HttpRequest' class) is used to generate the respose back to the user. so now we need to build this 'idex.html' template so it can return this page called 'index.html'. so first we need to create a 'templates' folder and then we need to tell Django where that 'templates' folder is. Django by default is looking for a folder called 'templates' that er built and inside of it we gonna have a file called 'index.html'.
@@ -56,12 +57,12 @@ def post_single(request, post): #this value here 'post' represents that value on
     return render(request, 'beautifulmpttsingle.html', {'individualpost': mypost, 'user_comment': user_comment, 'previouscomments': previouscomments,'comments': comments, 'comment_form': comment_form}) #ازشان استفاده شده single.html کلیدهای این دیکشنری همون اسم‌هایی هستند که در تمپلیت مربوطه یعنی
 
 #we want to build a category page whereby we go to that category page and it shows us all the posts of a specific category. First of all for this purpose we need to import 'ListView' class(a class-based view) from 'django.views.generic' so that we can use class-based views. now we're gonna generate a new class-based view to extract the information from the database that's relevant to the URL. so what
-#does that mean? what we want to do is when someone types in for example 'category/F1/' it's gonna show all the F1 posts. so we're gonna be able to in our view extract the word 'F1' essentially and we're gonna use that to query the database. so let's go ahead and create a new class-based view 
+#does that mean? what we want to do is when someone types in for example 'categories/F1/' it's gonna show all the F1 posts. so we're gonna be able to in our view extract the word 'F1' essentially and we're gonna use that to query the database. so let's go ahead and create a new class-based view 
 class CatListView(ListView): # a class-based view (CBV) in Django using the 'ListView' to display a list of categories. This class inherits from Django's 'ListView'. This means it will inherit all the functionality of a list view, which is designed to display a list of objects from a specified model.
     # model = Category
     template_name = 'category.html'
     context_object_name = 'catlist' #This is where the data is being stored and inside of it we have got 'cat' and 'postsofacat'. #so when we pass a data back into our template we're gonna need some sort of context name for that data. So we're gonna be able to extract or collect that data on our template via the 'catlist' keyword. so that's how we can access our data on our 'category.html' page.
-    #The attributeon the top line specifies the name of the variable that will be used in the template context to refer to the list of categories. Instead of using the default name (object_list), it will be accessible as 'catlist' in your template.
+    #The attribute on the top line specifies the name of the variable that will be used in the template context to refer to the list of categories. Instead of using the default name (object_list), it will be accessible as 'catlist' in your template.
     # def get_queryset(self) -> QuerySet[Any]: #برای بازپس‌گرفتن اینستنس‌های یک مدل از دیتابیس
     #     return super().get_queryset()
     '''
@@ -114,3 +115,28 @@ def Category_navbar(request):
         "category_list": categorynavbar,
     }
     return content
+
+def post_search(request):
+    form = PostSearchForm() #we created a form (put the form inside of the variable 'form' and then we're sending it to the template)
+    h = '' #we created a new variable and it's just empty. we filled it up shortly.
+    cgry=''
+    results = []
+    query = Q()
+    if 'h' in request.GET: #we're gonna check to see if any data exists in the get request.If the data does exist in the get request (the 'q' data) then we're gonna process this information
+        form = PostSearchForm(request.GET)
+        if form.is_valid():
+            h = form.cleaned_data['h'] #once the form has been checked the data is available from the 'cleaned_data'
+            cgry = form.cleaned_data['cgry']  #cgry is gonna hold a value (the id of that category like 1,2,..) it is not gonna hold the category name. now now we need to use this data inside of our query. so we want to query the title contains 'h' and then what we want to do first of all is set up a new filter
+            # results = Post.objects.filter(title__contains = h) #now we set up a simple query, we called this 'results' (a variable called 'results') and basically we need to query the 'Post' model and the we say 'objects' and we use a filter. so what we want to filter from the model is to look for all the data where the title contains 'q' (remember 'q' is what someone's typed into the search input).
+            #we can use 'contain' assuming that someone's gonna type in single word or words that are grouped together to return the title or the post. Or we can utilize for example 
+            #once we start moving to a postgres database we then have more facilities available to make much more complicated search.
+            # results = Post.objects.filter(category=cgry).filter(title__contains = h)  #استفاده کنیم cgry این همان کوئری هست که گفتیم باید توش از اطلاعات کپچرشده در
+    # return render(request, 'search.html', {'form': form, 'h':h, 'results':results})   #so next up we now have the form, we want to pass that now, we're gonna set up a http response, so we just return the form to the new page that we're gonna build called 'search.html', and then we're gonna send the form data to that template. حالا باید این تمپلیت را بسازیم
+            #اگر بخواهیم فیلد مربوط به انتخاب کتگوری را اختیاری کنیم دیگر کوئری ساخته شده در دو خط بالا کار نمیکند به همان دلیلی که در فایل مربوط به فرمز توضیح دادم
+            #so we're gonna modulize our query based upon different parameters
+            if cgry is not None:
+                query &= Q(category=cgry)
+            if h is not None:
+                query &= Q(title__contains=h)
+            results = Post.objects.filter(query)
+    return render(request, 'search.html', {'form': form, 'h':h, 'results':results})

@@ -1,0 +1,58 @@
+{%extends "base.html"%}
+
+{%block title%}
+Search Page
+{%endblock%}
+{% block content %}
+<div class="container pt-5">
+    {% if h %} <!--If there is data in 'q' (if someone actually has typed in something into the input) then display all that information and all that posts that are returned from the search, else show the form-->
+    <h1>Posts containing "{{ h }}":
+            {% if cgry %}
+            In category "{{ cgry }}"
+            {% endif %}
+    </h1>
+    <p>
+        {% with results.count as total_results %}
+        Found {{ total_results }} result{{ total_results|pluralize }}
+        {% endwith %}
+    </p>
+
+    <div class="album py-5 bg-light">
+        <div class="container">
+            <div class="row">
+    {% for post in results %}
+    <!-- <h5><a href="{{ post.get_absolute_url }}">{{ post.title }}</a></h5> -->
+    <div class="col-md-4 mb-4">
+        <a class="text-dark text-decoration-none" href="{{ post.get_absolute_url }}">
+            <div class="card md-4 box-shadow">
+                {% if post.cardimage %}
+                    <img class="card-img-top" src="{{ post.cardimage.url }}" alt="{{ post.title}}">
+                {% else %}
+                    <img class="card-img-top" src="https://hips.hearstapps.com/hmg-prod/images/lewis-hamilton-of-great-britain-and-mercedes-walks-in-the-news-photo-1722974620.jpg?crop=1.00xw:1.00xh;0,0&resize=1200:*" alt="Default Image">
+                {% endif %}
+                <div class="card-body">
+                    <h2 style="font-size:18px; font-weight:bold;">{{ post.title|truncatechars:50 }}</h2>
+                    <p class="card-text">{{ post.excerpt|truncatechars:50 }}</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-muted">9 mins</small>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+    {% empty %} <!--if there isn't anything returned, lt's just gonna say there are no results for your query.-->
+    <p>There are no results for your query.</p>
+    {% endfor %}
+    <p><a href="{% url "blog:post_search" %}" class="btn btn-primary my-1" role="button" aria-disabled="true">New Search</a></p>
+    {% else %}
+    <h1 class="my-4">Search for posts</h1>
+    <form method="get"> <!--we're gonna be utilizing the method 'get' to send the data or query data that someone types into the input field to search for an item by 'get'-->
+        {{ form.as_p }} <!--That basically renders the form as a series of <p> tags with each p containing one field.--><!--The expression {{ form.as_p }} in your Django template is a convenient way to render a Django form as HTML, specifically wrapping each form field in <p> (paragraph) tags.-->
+        <input class="btn btn-primary my-1 mx-1" type="submit"value="search"> <!--so now the basic components of the form is being constructed we now gonna head over to the views and just set up the logic so that we can capture that data and then return the results to the template.in views we create a container for the results (a list)-->
+    </form>
+    {% endif %}
+</div>
+</div>
+</div>
+</div>
+{% endblock %}
