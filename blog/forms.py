@@ -14,7 +14,7 @@ class NewCommentForm(forms.ModelForm):
     parent = TreeNodeChoiceField(queryset=Comment.objects.all()) #'parent' was foreignkey in our 'Comment' model in 'models.py'
     class Meta:
         model = Comment #I created a form by utilizing the 'Comment' database.
-        fields = ('name', 'parent', 'email', 'content')           #These fields gonna be generated into inputs in our form.Django turned those fields into input fields that we can utilize on the template.
+        fields = ('name', 'parent', 'email', 'content')           #These fields gonna be generated into inputs in our form. Django turned those fields into input fields that we can utilize on the template.
         widgets = {                                      #we don't have direct access to the form, because remember the form is being generated automatically so there's no way of me other than injecting som code into the form, of me actually formatting that form in a Bootstrap way. so we use this widget option to add some styling to our form.
             "name": forms.TextInput(attrs={"class" : "form-control"}),
             "email": forms.EmailInput(attrs={"class": "form-control"}),
@@ -30,8 +30,8 @@ class NewCommentForm(forms.ModelForm):
 #'forms.Form': Does not have any direct association with a model. You define all fields manually, and it can be used for various purposes (e.g., search forms, login forms).
 #let's go ahead and create a new form for our search.
 class PostSearchForm(forms.Form):
-    h = forms.CharField(label='Query:')  #we're not gonna build a form, we're gonna utilize Django and tell Django what type of form we want and we do that by basically set  up this variable 'q' (query).Basically we're gonna say from 'forms' we just want to build a character field input. we just told Django that we want to make a new form and we want one input and that's just gonna be a character field. (ساختیم post_search و ویوای به نام views.py رفتیم توی فایل)
-    cgry = forms.ModelChoiceField(label='Category',queryset=Category.objects.exclude(name='default').order_by('name'))#next up we want to add the drop-down facility so not only do we want the user to be able to search for a word, we want to be able to let them select a category we want to search within. 'ModelChoiceField' is gonna create a drop-down choice field.
+    h = forms.CharField()  #we're not gonna build a form, we're gonna utilize Django and tell Django what type of form we want and we do that by basically set  up this variable 'q' (query).Basically we're gonna say from 'forms' we just want to build a character field input. we just told Django that we want to make a new form and we want one input and that's just gonna be a character field. (ساختیم post_search و ویوای به نام views.py رفتیم توی فایل)
+    cgry = forms.ModelChoiceField(queryset=Category.objects.exclude(name='default').order_by('name'))#next up we want to add the drop-down facility so not only do we want the user to be able to search for a word, we want to be able to let them select a category we want to search within. 'ModelChoiceField' is gonna create a drop-down choice field.
     #l want to query my 'Category' model and select all the information order it by name and l want to use all the category names as the drop-down items. 
     #for example you wanted to make your own choices, set up the choices here (FRUIT_CHOICES) you can create a label and a widget and use the 'choices'
             # FRUIT_CHOICES = [
@@ -53,3 +53,10 @@ class PostSearchForm(forms.Form):
          #یعنی در ویومان گفتیم که ما پست‌های مربوط به یک کتگوری خاص را می‌خواهیم و وقتی کتگوری را مشخص نکنیم میره دنبال پست‌هایی می‌گرده که جزو هیچ کتگوری‌ای نیستن و خب ما همچین پست‌هایی اصلا نداریم
          #When we don't select anything in categories this is returning nothing so what this is querying is looking for all the posts where the category equals nothing.
          #Q objects allow us to perform complex lookups in our queries.
+        # self.fields['cgry'].label = ''
+        self.fields['cgry'].label = 'Category'
+        self.fields['h'].label = 'Search For'
+        self.fields['h'].widget.attrs.update(
+            {'class': 'form-control menudd'})
+        self.fields['h'].widget.attrs.update(
+            {'data-toggle': 'dropdown'})

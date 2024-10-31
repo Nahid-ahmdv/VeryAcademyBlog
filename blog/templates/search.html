@@ -17,7 +17,7 @@ Search Page
         {% endwith %}
     </p>
 
-    <div class="album py-5 bg-light">
+    <div class="album py-2 bg-light">
         <div class="container">
             <div class="row">
     {% for post in results %}
@@ -47,7 +47,9 @@ Search Page
     {% else %}
     <h1 class="my-4">Search for posts</h1>
     <form method="get"> <!--we're gonna be utilizing the method 'get' to send the data or query data that someone types into the input field to search for an item by 'get'-->
-        {{ form.as_p }} <!--That basically renders the form as a series of <p> tags with each p containing one field.--><!--The expression {{ form.as_p }} in your Django template is a convenient way to render a Django form as HTML, specifically wrapping each form field in <p> (paragraph) tags.-->
+        {{ form.as_p }} <!--this gonna create a loop and loop out all the items (fields) that we request (in this case according to our form 'h' and 'cgry' fields). what we can also do is we can select individual components to output. for example in this case we have two inputs ('h' and 'cgry'), and instead of {{ form.as_p}} if we write {{ form.h }} or {{ form.cgry }} only 'h' or 'cgry' field would be shown--> 
+        <!--That basically renders the form as a series of <p> tags with each p containing one field.-->
+        <!--The expression {{ form.as_p }} in your Django template is a convenient way to render a Django form as HTML, specifically wrapping each form field in <p> (paragraph) tags.-->
         <input class="btn btn-primary my-1 mx-1" type="submit"value="search"> <!--so now the basic components of the form is being constructed we now gonna head over to the views and just set up the logic so that we can capture that data and then return the results to the template.in views we create a container for the results (a list)-->
     </form>
     {% endif %}
@@ -56,3 +58,8 @@ Search Page
 </div>
 </div>
 {% endblock %}
+<!--
+ajax is a set of web development techniques allowing us to create asynchronous web applications. So previously our search bar required us to actually type in something and press Enter,the page would refresh and then it would show the search results.So with AJAX we can create asynchronous web applications so we don't have to refresh the page we can send a message to the server that 
+can create a query, query the database and return the data without having to refresh the page.so therefore that allows us to create a search suggestion drop-down when the user starts typing something into the seach input field.
+so we're gonna be utilizing jquery to help us write AJAX in a really simplistic way.
+-->

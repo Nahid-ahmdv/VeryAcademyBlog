@@ -6,6 +6,8 @@ from .forms import NewCommentForm, PostSearchForm
 from django.views.generic import ListView #'ListView' is a built-in generic class-based view provided by Django. It is designed to simplify the process of displaying a list of objects from a database model. By using 'ListView', you can quickly create views that handle common tasks such as retrieving records, paginating results, and rendering them in a template without writing repetitive code.
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger #we add all the scaffolding to easily create a pagination system #اینا رو برای اعمال پجینیشن ایمپورت کردیم
 from django.db.models import Q
+from django.core import serializers
+from django.http import JsonResponse
 # Create your views here.  
 def home(request):
     # return render(request, 'index.html')#this line is just returning 'index' page. #this is a simple view and just gonna return a template 'index.html'. and this 'request' object (The 'request' object is an instance of the 'HttpRequest' class) is used to generate the respose back to the user. so now we need to build this 'idex.html' template so it can return this page called 'index.html'. so first we need to create a 'templates' folder and then we need to tell Django where that 'templates' folder is. Django by default is looking for a folder called 'templates' that er built and inside of it we gonna have a file called 'index.html'.
@@ -122,6 +124,21 @@ def post_search(request):
     cgry=''
     results = []
     query = Q()
+    #کپچر کنیم AJAX request نوشتم و الان می‌خواهیم اطلاعات را از AJAXsearch.html در فایل an AJAX request in jQuery خط بعدی را بلافاصله پس از نوشتن  
+    #first of all we're gonna put this inside of an 'if', so we're gonna check to see if there is actually a request that's been made:
+    if request.POST.get('action') == 'post':  #l'm basically just checking to see if that's available. there's a few different ways that we can check if we're actually receiving an AJAX request. this is just simply one way. 
+     #so if we do have a request then we're gonna do something,first we 're gonna store the data (that's been typed in from the user)
+        search_string = str(request.POST.get('ss')) #so that's the data now captured. now we want to do sth with it (perform a query).
+        if search_string is not None:
+            search_string = Post.objects.filter( #we're gonna query the Post table (we output the data from the database into the variable 'search_string'so now this variable has all the data that's returned from a database). we probably don't want to return hundred items in a drop-down list as a search suggestion. so we can just type in a number here and just limit the amount that gets returned from the database.
+                title__contains=search_string)[:4] #we're utilizing JavaScript and Python (of course by default they can't talk to each other so we need to prepare this data so it can be utilized by JavaScript, what we're gonna need to do now is serialize the data that's returned from the database, so we need to import the serializers)
+            data = serializers.serialize('json', list(search_string), fields =('id', 'title', 'slug'))      #so we created a new variable called 'data' and we're gonna serialize the data that gets returned from the database (we store the output of the serialization) and we want to serialize in 'json', and then we define what data we want to serialize and what fields we want to get serialized (we probably don't want to return all the data from the database, we're not gonna need the content to be displayed in the drop-down list.)
+            #so we just need to return this 'data' to the search page (AJAXsearch.html). so we're gonna return this 'data' in a json response (because we've serialized it as Json in the 'data' ) so we're gonna need to import the 'JsonResponse'
+            return JsonResponse({'search_string': data})   #we're gonna send it back as reference to 'search_string' (that is the reference point to send the data back to, that's how we're gonna collect the data or where it's gonna be stored when we send it back to the search and what we're gonna send back is all the data inside of that(the data that we serialized))
+            #است ذخیره میشود json که function در صورت موفقت‌آمیز بودن در ورودی AJAXsearch.html ایی که داریم برمی‌گرداریم به صفحه سرچ‌مان یعنی همانdata دقت کنید این
+
+
+
     if 'h' in request.GET: #we're gonna check to see if any data exists in the get request.If the data does exist in the get request (the 'q' data) then we're gonna process this information
         form = PostSearchForm(request.GET)
         if form.is_valid():
@@ -139,4 +156,4 @@ def post_search(request):
             if h is not None:
                 query &= Q(title__contains=h)
             results = Post.objects.filter(query)
-    return render(request, 'search.html', {'form': form, 'h':h, 'results':results})
+    return render(request, 'FAJAXsearch.html', {'form': form, 'h':h, 'results':results})
