@@ -1,0 +1,55 @@
+<style>
+    /* Remove underline from links and add hover effect */
+    .footer-link {
+        text-decoration: none;
+        color: #6c757d; /* Default muted color */
+        transition: color 0.3s ease, text-shadow 0.3s ease; /* Smooth transitions */
+    }
+
+    /* Change color and simulate bold effect on hover */
+    .footer-link:hover {
+        color: #007bff; /* Change to your desired hover color */
+        text-shadow: 1px 0 0 currentColor; /* Simulate bold effect */
+    }
+</style>
+
+<!-- This is gonna be the generic footer page for our application -->
+<div class="container">
+    <footer class="pt-4 my-md-5 pt-md-5 border-top">
+        <div class="row">
+            <div class="col-12 col-md">
+                <!-- <img class="mb-2" src="https://getbootstrap.com/docs/5.0/assets/brand/bootstrap-logo.svg" alt="Bootstrap Logo" width="24" height="24"> -->
+                <small class="d-block mb-3 text-muted">&copy; 2017-2020</small>
+            </div>
+            <div class="col-6 col-md">
+                <h5>Features</h5>
+                <ul class="list-unstyled text-small">
+                    <li><a class="footer-link" href="#">Cool stuff</a></li>
+                    <li><a class="footer-link" href="#">Random feature</a></li>
+                    <li><a class="footer-link" href="#">Team feature</a></li>
+                    <li><a class="footer-link" href="#">Stuff for developers</a></li>
+                    <li><a class="footer-link" href="#">Another one</a></li>
+                    <li><a class="footer-link" href="#">Last time</a></li>
+                </ul>
+            </div>
+            <div class="col-6 col-md">
+                <h5>Resources</h5>
+                <ul class="list-unstyled text-small">
+                    <li><a class="footer-link" href="#">Resource</a></li>
+                    <li><a class="footer-link" href="#">Resource name</a></li>
+                    <li><a class="footer-link" href="#">Another resource</a></li>
+                    <li><a class="footer-link" href="#">Final resource</a></li>
+                </ul>
+            </div>
+            <div class="col-6 col-md">
+                <h5>About</h5>
+                <ul class="list-unstyled text-small">
+                    <li><a class="footer-link" href="#">Team</a></li>
+                    <li><a class="footer-link" href="#">Locations</a></li>
+                    <li><a class="footer-link" href="#">Privacy</a></li>
+                    <li><a class="footer-link" href="#">Terms</a></li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+</div>

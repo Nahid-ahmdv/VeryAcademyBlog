@@ -14,7 +14,7 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  #توضیحات پایین صفحه
 # from pathlib import Path
 # BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
@@ -39,7 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'blog',
-    'mptt'
+    'mptt',
+    'accounts',
 ]
 
 MIDDLEWARE = [
@@ -57,8 +58,8 @@ ROOT_URLCONF = 'mysite.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],#توضیحات بیشتر پایین صفحه # A list of directories where Django will look for templates. #This line of code is used to specify the directories where Django should look for template files. 
+        'APP_DIRS': True, #When you set 'APP_DIRS = True', Django automatically looks for a folder named 'templates' within each installed app for your templates.
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
@@ -128,3 +129,91 @@ STATIC_URL = '/static/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media') #first: we need to define the media root which is going to be the operating system path and then 'BASE_DIR' and then a folder called 'media'.
 MEDIA_URL = '/media/' #second: so this will define the fact that we're gonna be utilizing our domain name slash then a folder called 'media'. so then l will go ahead and create a folder called 'media' for the images that l'm gonna be saving. so to get this all working the next step is that we're going to install 'pillow' (python image library) which is a free and open source additional library for the python programming language that adds support for opening manipulating and saving many different file image formats. after installing 'pillow' now
 #we are ready to head over to the 'blog' app and then open up the 'models.py' and add a specific field to our 'Post' model, after that we go to 'urls.py' file in 'mysite' folder and add this line underneath the 'urlpatterns' "static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)". and we also need to import two things here "from django.conf import settings from django.conf.urls.static import static", then we go to our template 'index.html'
+LOGIN_REDIRECT_URL = 'accounts:profile'
+LOGIN_URL = 'login'
+LOGOUT_URL = 'logout'
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend' #This line configures the email backend to use the console for outputting email messages instead of sending them through an SMTP server. This is particularly useful during development for testing purposes, as it allows developers to see the email content directly in the console without actually sending emails.
+#the line above:we set out the settings to capture the emails, so we added some code to capture the email because we don't have an email server.
+'''
+the statement "templates in Django authentication by default is looking for a folder called 'registration'" is correct. Here’s a detailed explanation based on the search results:
+Explanation
+Default Template Location:
+When you use Django's built-in authentication views (such as login, logout, password reset, etc.), Django expects to find the corresponding HTML templates in a directory named 'registration' within your templates directory. This is part of Django's convention for organizing authentication-related templates.
+Login Template:
+Specifically, for the login functionality, Django looks for a template file named 'login.html' located at 'templates/registration/login.html'. If this file is not found in that location, Django will raise a 'TemplateDoesNotExist' error when you attempt to access the login view.
+Creating the Directory Structure:
+To set this up correctly, you would typically create a directory structure like this in your Django project:
+text
+myproject/
+    templates/
+        registration/
+            login.html
+            signup.html
+            password_reset.html
+            ...
+
+This allows you to provide custom HTML for each of the authentication views that Django offers.
+Updating settings.py:
+You also need to ensure that your settings.py file is configured to include the base templates directory in its DIRS setting within the TEMPLATES configuration:
+python
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],  # Include your templates directory
+        'APP_DIRS': True,
+        ...
+    },
+]
+
+Using Authentication URLs:
+When you include Django's authentication URLs in your project (e.g., using path('accounts/', include('django.contrib.auth.urls'))), it automatically maps various authentication-related URLs to their respective views. These views will look for their corresponding templates in the specified registration folder.
+Summary
+In summary, when using Django's built-in authentication system, it is indeed correct that Django looks for templates in a folder called registration by default. This folder should contain the necessary HTML files (like login.html, signup.html, etc.) to handle user authentication processes. If you follow this convention and structure your templates accordingly, Django will be able to find and render them correctly during authentication operations.
+'''
+
+
+
+'''
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__))):
+__file__:
+This is a special variable in Python that holds the path to the current file. In this case, it refers to the settings.py file.
+os.path.abspath(__file__):
+This function returns the absolute path of settings.py. It resolves any relative paths and provides the full path.
+os.path.dirname(...):
+This function returns the directory name of the given path.
+Calling it once (os.path.dirname(__file__)) gives you the directory containing settings.py, which is typically something like myproject/myproject/.
+Calling it a second time (os.path.dirname(...)) moves one level up to the project directory (the one containing manage.py), which is typically myproject/.
+Example Directory Structure
+Let’s say your Django project structure looks like this:
+text
+myproject/
+    manage.py
+    myproject/
+        settings.py
+        urls.py
+        wsgi.py
+    templates/
+        base.html
+
+In this structure:
+The path to settings.py would be something like /path/to/myproject/myproject/settings.py.
+When you use os.path.abspath(__file__), it resolves to /path/to/myproject/myproject/settings.py.
+The first call to os.path.dirname() returns /path/to/myproject/myproject.
+The second call moves up one level, resulting in /path/to/myproject, which is your BASE_DIR.
+Using BASE_DIR
+After defining BASE_DIR, you can use it to construct paths for other settings. For example, in your TEMPLATES setting, you might have:
+python
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],  # Points to /path/to/myproject/templates
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                ...
+            ],
+        },
+    },
+]
+'''

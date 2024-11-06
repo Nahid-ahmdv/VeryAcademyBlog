@@ -1,0 +1,7 @@
+<!--This is the activation email that's gonna be sent to the user-->
+{% autoescape off %}
+Hello {{ user.username }},
+
+Your account has successfully created. Please click the link below to activate your account
+http://{{ domain }}{% url 'accounts:activate' uidb64=uid token=token %}<!-- we're trying to construct a url the user can click on in their email which uniquely identifies them and also identifies the fact that they the person that has registered  we wrote user id a unique token, we need to generate the unique token -->
+{% endautoescape %}

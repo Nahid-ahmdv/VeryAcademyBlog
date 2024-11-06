@@ -1,0 +1,166 @@
+{% extends "../base/base.html" %} <!--The '..' in the path is a relative path notation that means "go up one directory level."-->
+{% block title %}Log-in{% endblock %}
+{% block content %}
+<!--<form action="." method="post"> The 'action' attribute in the <form> tag specifies where the form data should be sent when the form is submitted.
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button class="" type="submit" value="Log_in">Sign in</button> The 'type' attribute specifies the behavior of the button when it is clicked. The 'value' attribute defines a value associated with the button.
+</form>-->
+{% if request.user.is_authenticated %} <!--If the user is authenticated, this JavaScript code will run. It changes the current page's URL to the one specified by the {% url "accounts:profile" %} template tag, which generates the URL for the profile view based on its name in the URL configuration.-->
+<script>
+    window.location.href = '{% url "accounts:profile" %}' //the app_name in 'urls.py' is 'accounts' and in 'urls.py' in 'mysite' we have 'namespace='accounts'' so that can make it easier to define what url you're trying to look for or utilize so that is why we're using that namespace there.
+</script>
+{% endif %}   <!--اگه این الاجیک نباشه وقتی یوزر ساین‌این می‌کنه، اگه فلش برگشت به صفحه قبل رو بزنه، دواره براش صفحه ساین این میاد اما  با وجود این لاجیک  به صفحه پروفایلشون ارجاع داده می‌شن-->
+
+<style>
+    .login,
+    .image {
+        min-height: 100vh;
+    }
+
+    .bg-image {
+        background-image: url('https://picsum.photos/id/1079/1080');
+        background-size: cover;
+        background-position: center center;
+    }
+
+    .container-fluid {
+        max-width: 100%;
+    }
+
+    .account-form input {
+        border: 2px solid #ccc;
+        height: calc(2em + .75rem + 2px);
+    }
+
+    .account-form input:focus {
+        border-color: #1497ff;
+        box-shadow: inset 0 0px 0px rgba(0, 0, 0, 0.075), 0 0 0px rgba(255, 0, 0, 0.6);
+    }
+    /* Remove underline from links and add hover effect */
+    .footer-link {
+        text-decoration: none;
+        color: #6c757d; /* Default muted color */
+        transition: color 0.3s ease, text-shadow 0.3s ease; /* Smooth transitions */
+    }
+
+    /* Change color and simulate bold effect on hover */
+    .footer-link:hover {
+        color: #007bff; /* Change to your desired hover color */
+        text-shadow: 1px 0 0 currentColor; /* Simulate bold effect */
+    }
+</style>
+<div class="container-fluid"> <!--این کانتینر دو بخش دارد-->
+    <div class="row no-gutter"><!--بخش چپ-->
+        <div class="col-md-6 bg-light">
+            <div class="login d-flex align-items-center py-5">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-12 col-md-12  mx-auto">
+
+                            <form class="account-form p-4 rounded" action="{% url 'login' %}" method="post">
+
+                                {% csrf_token %}
+                                <p class="h4 mb-4 font-weight-bold"><b>Sign In</b></p><!-- It's just the first item -->
+
+                                {% if form.errors %} <!--previously we had "{{ form.as_p }}" but we can access a number of different facilities through form and one of them is errors. so if the user makes mistake a signal sent back to the template and we can capture that signal (these errors) and we can display a message-->
+                                <div class="alert alert-primary" role="alert">
+                                    Error: Username or Password not correct! <!--a blanket error چون نمی‌خواهیم دقیق بگوییم که یوزر غلط است یا پسورد که اگه کسی خواست هک کنه راهنمایی‌اش کرده باشیم-->
+                                </div>
+                                {% endif %}
+
+                                <label class="small font-weight-bold"><b>{{ form.username.label}}</b></label><!--توضیحات مربوط به لیبل در پایین-->
+                                {{ form.username}}
+
+                                <label class="small font-weight-bold"><b>{{ form.password.label}}</b></label>
+                                {{ form.password}}
+
+                                <button class="form-control btn btn-dark btn-block py-2 mb-4 mt-5 font-weight-bold" type="submit"
+                                    value="Log-in">Sign in
+                                </button>
+
+                                <hr class="mb-3">
+                                <p class="small text-center">By signing in to your account, you agree to Blog <a class="footer-link"
+                                        href="">Terms of
+                                        Service</a> and
+                                    consent to
+                                    our <a class="footer-link" href="#">Cookie Policy</a> and <a class="footer-link" href="">Privacy Policy</a>. This site is not
+                                    protected
+                                    by reCAPTCHA and
+                                    is a demonstration website
+                                    for learning purposes only.
+                                </p>
+                            </form>
+                            <p class="small text-center pt-4">
+                                <a class="footer-link" href="{% url "password_reset" %}">Forgotten Password?</a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 d-none d-md-flex bg-image"></div><!--بخش راست که عکسه-->
+    </div>
+</div>
+
+{% endblock %}
+
+
+
+
+
+<!--
+Explanation of the 'action' Attribute
+action=".":
+The value "." refers to the current URL or the same page where the form is located. This means that when the form is submitted, the data will be sent back to the same URL that rendered this form.
+In a web context, using "." is equivalent to using action="", which also submits the form to the current page.
+Form Submission:
+When a user fills out the form and clicks the "Sign in" button, the browser sends a' POST' request to the server with the data contained in the form fields.
+Since you specified method="post", this means that the data will be included in the body of the HTTP request rather than being appended to the URL (as would happen with a GET request).
+Example of Usage
+Here's how it works in practice:
+Current Page Handling: If this form is on a login page (e.g., /login/), when a user submits it, Django will process it as a 'POST' request to '/login/'.
+Server-Side Handling: On the server side (in your Django view), you would typically check if the request method is POST and handle authentication logic accordingly.
+Importance of Setting action
+Correct Data Handling: Setting the action correctly is crucial for ensuring that your application processes form submissions correctly. If omitted, or if set incorrectly, it could lead to errors or unintended behavior.
+Security Considerations: Using POST for sensitive information (like passwords) is also important because it does not expose data in the URL, making it less visible and more secure compared to GET requests.
+Summary
+In summary, in your <form action="." method="post">, setting action="." indicates that upon submission, the form data will be sent back to the same URL where the form is located. This is commonly used in scenarios like login forms where you want to process user credentials on the same page. The use of POST ensures that sensitive information is handled securely.
+-->
+<!--
+'type' Attribute:
+Purpose: The 'type' attribute specifies the behavior of the button when it is clicked.
+Possible Values:
+"submit": This is the value used in your example. A button with type="submit" will submit the form data to the server when clicked. It triggers the form's 'action', sending the data to the URL specified in the form's 'action' attribute.
+"reset": This type resets all form fields to their initial values.
+"button": This type creates a generic button that does not have any default behavior. It can be used for custom JavaScript actions.
+
+
+'value' Attribute:
+Purpose: The value attribute defines a value associated with the button. This value is sent to the server as part of the form data when the form is submitted.
+Usage in Submit Buttons: For buttons of type submit, the value can be used to identify which button was clicked if there are multiple submit buttons in a single form.
+-->
+
+<!--
+action="{% url 'login' %}":
+In your example, action="{% url 'login' %}" uses a Django template tag ({% url 'login' %}) to dynamically generate the URL for the login view.
+This means that when the form is rendered, Django will replace {% url 'login' %} with the actual URL associated with the named URL pattern 'login' defined in your Django project's URL configuration.
+HTTP Method:
+The method="post" specifies that the form data should be sent using the POST HTTP method. This method sends data in the body of the request, making it suitable for sensitive information (like passwords) and larger amounts of data.
+How It Works
+When a user fills out this form and clicks the submit button, the browser will send a POST request to the URL generated by {% url 'login' %}.
+The server-side view associated with that URL will then process the submitted data (e.g., authenticate a user).
+-->
+
+<!--
+Field Labels:
+By default, Django automatically generates labels for form fields based on the field names. For example:
+The 'username' field will have a default label of "Username".
+The 'password' field will have a default label of "Password".
+You can customize these labels by using the 'label' parameter when defining the field, like so:
+python
+username = forms.CharField(
+    label='Your Username',  # Custom label
+    widget=forms.TextInput(attrs={'class': 'form-control mb-3', 'placeholder': 'Username', 'id': 'login-username'})
+)
+-->

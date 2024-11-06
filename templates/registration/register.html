@@ -1,0 +1,131 @@
+<!--as you imagine, this file is gonna be very similar to the login.html. lt's gonna be a half and half view and we're gonna have a template-->
+{% extends "../base/base.html" %}
+{% block title %}Log-in{% endblock %}
+{% block content %}
+{% if request.user.is_authenticated %} <!--we're gonna check to see if user is authenticated. If they're authenticated they're not gonna need to register -->
+<script>
+    window.location.href = '{% url "accounts:profile" %}'
+</script>
+{% endif %}
+
+<style>
+    .login,
+    .image {
+        min-height: 100vh;
+    }
+
+    .bg-image {
+        background-image: url('https://picsum.photos/id/433/1080');
+        background-size: cover;
+        background-position: center center;
+    }
+
+    .container-fluid {
+        max-width: 100%;
+    }
+
+    /* .account-form input {
+        border: 2px solid #ccc;
+        height: calc(2em + .75rem + 2px);
+    } */
+
+    .account-form input:focus {
+        border-color: #1497ff;
+        box-shadow: inset 0 0px 0px rgba(0, 0, 0, 0.075), 0 0 0px rgba(255, 0, 0, 0.6);
+        border: 2px solid #ccc;
+        height: calc(2em + .75rem + 2px);
+    }
+    /* Remove underline from links and add hover effect */
+    .footer-link {
+        text-decoration: none;
+        color: #6c757d; /* Default muted color */
+        transition: color 0.3s ease, text-shadow 0.3s ease; /* Smooth transitions */
+    }
+
+    /* Change color and simulate bold effect on hover */
+    .footer-link:hover {
+        color: #007bff; /* Change to your desired hover color */
+        text-shadow: 1px 0 0 currentColor; /* Simulate bold effect */
+    }
+</style>
+<div class="container-fluid"> <!--این کانتینر دو بخش دارد-->
+    <div class="row no-gutter"><!--بخش چپ-->
+        <div class="col-md-6 bg-light">
+            <div class="login d-flex align-items-center py-5">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-12 col-md-12  mx-auto">
+
+                            <form class="account-form p-4 rounded col-lg-10 mx-auto" action="." method="post">
+                                {% csrf_token %}
+                                <p class="h4 mb-2 font-weight-bold"><b>Create an account</b></p>
+                                <p class="mb-4">It's free and only takes a minute.</p>
+
+                                {% if form.errors %}
+                                <p>Please correct the following errors:</p>
+                                {% for field in form %}
+                                {% if field.errors %}
+                                <!--an alert block with the custom error inside -->
+                                <div class="alert alert-primary" role="alert">
+                                    {{ field.label }}: {{ field.errors|striptags }}
+                                </div>
+                                {% endif %}
+                                {% endfor %}
+                                {% endif %}
+
+                                <label class="form-label font-weight-bold">{{ form.username.label }} <span class="text-muted">(Required)</span></label>
+                                {{ form.username }}
+                                
+                                <label class="form-label font-weight-bold">{{ form.email.label }} <span class="text-muted">(Required)</span></label>
+                                {{ form.email }}
+                                
+                                <label class="form-label font-weight-bold">{{ form.password.label }} <span class="text-muted">(Required)</span></label>
+                                {{ form.password }}
+                                <small class="form-text text-muted mb-4">At least 8 characters and 1 digit</small>
+                                
+                                <br><br>
+                                
+                                <label class="form-label font-weight-bold">{{ form.password2.label }} <span class="text-muted">(Required)</span></label>
+                                {{ form.password2 }}
+                                <small class="form-text text-muted mb-4">Repeat password</small>
+                                <br>
+                                <br>
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="Newsletter">
+                                    <label class="custom-control-label" for="Newsletter">
+                                        Subscribe to our newsletter</label>
+                                </div>
+
+                                <button class="form-control btn btn-dark btn-block py-2 mb-4 mt-4 font-weight-bold"
+                                    type="submit">Register</button>
+
+                                <hr class="mb-3 mt-3">
+                                <!--just to make it look nice-->
+                                <p class="small text-center">By clicking on register, you agree to Blog <a href="">Terms
+                                        of
+                                        Service</a> and
+                                    consent to
+                                    our <a href="">Cookie Policy</a> and <a href="">Privacy Policy</a>. This site is not
+                                    protected
+                                    by reCAPTCHA and
+                                    is a demonstration website
+                                    for learning purposes only.
+                                </p>
+                            </form>
+
+                            <p class="small text-center pt-4">
+                                <a href="{% url "accounts:login" %}">Already have an account?</a>
+                            </p>
+                            <p class="small text-center">
+                                <a href="{% url "accounts:register" %}">Help Center?</a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 d-none d-md-flex bg-image"></div><!--بخش راست که عکسه-->
+    </div>
+</div>
+
+{% endblock %}

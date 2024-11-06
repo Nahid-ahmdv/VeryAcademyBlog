@@ -1,0 +1,51 @@
+<style>
+    .dot {
+        height: 30px;
+        width: 30px;
+        background-color: #000;
+        border-radius: 50%;
+        display: inline-block;
+    }
+
+    /* Remove underline from links */
+    .nav-link, .navbar-nav a, .text-dark {
+        text-decoration: none;
+        transition: color 0.3s ease, text-shadow 0.3s ease; /* Smooth transitions */
+    }
+
+    /* Simulate bold effect on hover using text-shadow */
+    .nav-link:hover, .navbar-nav a:hover, .text-dark:hover {
+        color: #007bff; /* Change to your desired hover color */
+        text-shadow: 1px 0 0 currentColor; /* Simulate bold effect */
+    }
+</style>
+
+<div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 border-bottom shadow-sm" style="background-color: #e3fdf6;">
+    <h5 class="my-0 me-md-auto fw-normal"><a class="text-dark" href="/">Demo</a></h5>
+    <nav class="my-2 my-md-0 me-md-3">
+        <a class="p-2 text-dark" href="#">Features</a>
+        <a class="p-2 text-dark" href="#">Enterprise</a>
+        <a class="p-2 text-dark" href="#">Support</a>
+    </nav>
+
+    {% if request.user.is_authenticated %}
+    <span class="dot"></span>
+    <ul class="navbar-nav">
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle text-dark" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                <a class="dropdown-item" href="{% url "accounts:profile" %}">Dashboard</a>
+                <a class="dropdown-item" href="{% url "accounts:edit" %}">Edit details</a>
+                <a class="dropdown-item" href="{% url "password_change" %}">Change Password</a> <!-- هم میشه نوشت accounts:pwdforgot-->
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="/account/logout/">Logout</a></li>
+            </ul>
+        </li>
+    </ul>
+    {% else %}
+    <nav>
+        <a class="p-2 text-dark" href="{% url 'login' %}">Login</a>
+    </nav>
+    {% endif %}
+</div>

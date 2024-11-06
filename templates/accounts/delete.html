@@ -1,0 +1,39 @@
+{% extends "../base/base.html" %}
+{% block title %}Profile{% endblock %}
+{% block content %}
+<style>
+    .footer-link {
+        text-decoration: none;
+        color: #1497ff; /* Default muted color */
+        transition: color 0.3s ease, text-shadow 0.3s ease; /* Smooth transitions */
+    }
+
+    /* Change color and simulate bold effect on hover */
+    .footer-link:hover {
+        color: #007bff; /* Change to your desired hover color */
+        text-shadow: 1px 0 0 currentColor; /* Simulate bold effect */
+    }
+</style>
+<div class="container-fluid my-5">
+    <section class="px-md-5 mx-md-5 text-center text-lg-left dark-grey-text">
+        <div class="row d-flex justify-content-center">
+            <div class="col-md-6">
+                <form class="form-reset p-4 rounded update-form" action="{% url "accounts:deleteuser" %}" method="post">
+                    {% csrf_token %}
+                    <p class=" h5 mb-4  mt-5 font-weight-bold"><b>Delete Account</b></p>
+                    <p>Are you sure you want to delete your account?
+                        *Important - your account data will remain available for 20 days</p>
+                    <button type="submit" role="button"
+                        class="form-control btn btn-danger btn-block py-2 mb-4 mt-5 font-weight-bold"><b>Delete</b></button>
+                </form>
+                <p class="small text-center pt-4">
+                    <a class="footer-link" href="{% url "accounts:profile" %}">Back to Dashboard</a> <!-- url "accounts:profile": is a Django template tag that generates a URL based on the name of a view defined in your URL configuration (urls.py).-->
+                </p>
+                <p class="small text-center">
+                    <a class="footer-link" href="{% url "accounts:register" %}">Help Center?</a>
+                </p>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}
